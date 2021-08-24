@@ -1,5 +1,7 @@
 package astilectron
 
+import "context"
+
 //protocol represents the protocol object
 //https://www.electronjs.org/docs/api/protocol
 type Protocol struct {
@@ -12,6 +14,10 @@ const (
 	//todo whats the proper schema??
 	EventNameSessionEventProtocolInterceptedStringProtocol = "protocol.event.intercept.string.protocol"
 )
+
+func newProtocol(ctx context.Context, d *dispatcher, i *identifier, w *writer) *Protocol {
+	return &Protocol{object: newObject(ctx, d, i, w, i.new())}
+}
 
 //func passed in from user
 func (s *Protocol) InterceptStringProtocol(scheme string, fn func(i Event) (mimeType string, data string, deleteListener bool)) (err error) {

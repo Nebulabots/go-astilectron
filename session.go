@@ -25,12 +25,16 @@ const (
 // https://github.com/electron/electron/blob/v1.8.1/docs/api/session.md
 type Session struct {
 	*object
-	*Protocol
+	Protocol *Protocol
 }
 
 // newSession creates a new session
 func newSession(ctx context.Context, d *dispatcher, i *identifier, w *writer) *Session {
-	return &Session{object: newObject(ctx, d, i, w, i.new())}
+	s := &Session{object: newObject(ctx, d, i, w, i.new())}
+
+	s.Protocol = newProtocol(ctx, d, i, w)
+
+	return s
 }
 
 // ClearCache clears the Session's HTTP cache
