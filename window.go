@@ -65,6 +65,8 @@ const (
 	EventNameWindowEventUpdatedCustomOptions                          = "window.event.updated.custom.options"
 	EventNameWindowLoadedURL                                          = "window.event.loaded.url"
 	EventNameWindowGetUrl                                             = "window.event.get.url"
+	EventNameWindowCmdSetBrowserView                                  = "window.cmd.set.browser.view"
+	EventNameWindowEventSetBrowserView                                = "window.event.set.browser.view"
 )
 
 // Title bar styles
@@ -268,6 +270,14 @@ func newWindow(ctx context.Context, l astikit.SeverityLogger, o Options, p Paths
 	return
 }
 
+// func (w *Window) CreateBrowserView() {
+// 	if err = w.ctx.Err(); err != nil {
+// 		return
+// 	}
+// 	_, err = synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdCreate, SessionID: w.Session.id, TargetID: w.id, URL: w.url.String(), WindowOptions: w.o}, EventNameWindowEventDidFinishLoad)
+// 	return
+// }
+
 // NewMenu creates a new window menu
 func (w *Window) NewMenu(i []*MenuItemOptions) *Menu {
 	return newMenu(w.ctx, w.id, i, w.d, w.i, w.w)
@@ -317,6 +327,14 @@ func (w *Window) Create() (err error) {
 	}
 	_, err = synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdCreate, SessionID: w.Session.id, TargetID: w.id, URL: w.url.String(), WindowOptions: w.o}, EventNameWindowEventDidFinishLoad)
 	return
+}
+
+// SetBrowserView sets a browserview to a window
+func (w *Window) SetBrowserView(browserViewId string) {
+	if err := w.ctx.Err(); err != nil {
+		return
+	}
+	synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdSetBrowserView, TargetID: w.id, BrowserViewID: browserViewId}, EventNameWindowEventSetBrowserView)
 }
 
 // Destroy destroys the window
