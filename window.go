@@ -89,6 +89,7 @@ type Window struct {
 	onMessageOnce      sync.Once
 	Session            *Session
 	url                *stdUrl.URL
+	BrowserView        *BrowserView
 }
 
 // WindowOptions represents window options
@@ -270,14 +271,6 @@ func newWindow(ctx context.Context, l astikit.SeverityLogger, o Options, p Paths
 	return
 }
 
-// func (w *Window) CreateBrowserView() {
-// 	if err = w.ctx.Err(); err != nil {
-// 		return
-// 	}
-// 	_, err = synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdCreate, SessionID: w.Session.id, TargetID: w.id, URL: w.url.String(), WindowOptions: w.o}, EventNameWindowEventDidFinishLoad)
-// 	return
-// }
-
 // NewMenu creates a new window menu
 func (w *Window) NewMenu(i []*MenuItemOptions) *Menu {
 	return newMenu(w.ctx, w.id, i, w.d, w.i, w.w)
@@ -330,11 +323,14 @@ func (w *Window) Create() (err error) {
 }
 
 // SetBrowserView sets a browserview to a window
-func (w *Window) SetBrowserView(browserViewId string) {
+func (w *Window) SetBrowserView(browserView *BrowserView) {
 	if err := w.ctx.Err(); err != nil {
 		return
 	}
-	synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdSetBrowserView, TargetID: w.id, BrowserViewID: browserViewId}, EventNameWindowEventSetBrowserView)
+
+	w.BrowserView = browserView
+
+	synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdSetBrowserView, TargetID: w.id, BrowserViewID: browserView.id}, EventNameWindowEventSetBrowserView)
 }
 
 // Destroy destroys the window

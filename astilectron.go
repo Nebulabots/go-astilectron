@@ -419,6 +419,11 @@ func (a *Astilectron) NewWindow(url string, o *WindowOptions) (*Window, error) {
 	return newWindow(a.worker.Context(), a.l, a.options, a.Paths(), url, o, a.dispatcher, a.identifier, a.writer)
 }
 
+//New BrowserView creates a new browserview
+func (a *Astilectron) NewBrowserView(url string, o *WindowOptions) (*BrowserView, error) {
+	return newBrowserView(a.worker.Context(), a.l, a.options, a.Paths(), url, o, a.dispatcher, a.identifier, a.writer)
+}
+
 // NewWindowInDisplay creates a new window in a specific display
 // This overrides the center attribute
 func (a *Astilectron) NewWindowInDisplay(d *Display, url string, o *WindowOptions) (*Window, error) {
