@@ -27,8 +27,11 @@ type Event struct {
 	BrowserViewID string            `json:"browserViewID,omitempty"`
 	Cancel        *bool             `json:"cancel,omitempty"`
 	CallbackID    string            `json:"callbackId,omitempty"`
+	Color         string            `json:"color,omitempty"`
 	Code          string            `json:"code,omitempty"`
-	Cookies       []SessionCookie   `json:"cookies,omitempty"`
+	//todo: can only be a string now?
+	CodeResult string          `json:"codeResult,omitempty"`
+	Cookies    []SessionCookie `json:"cookies,omitempty"`
 	// https://www.electronjs.org/docs/api/structures/protocol-response
 	Data                string               `json:"data,omitempty"`
 	Displays            *EventDisplays       `json:"displays,omitempty"`
@@ -37,6 +40,7 @@ type Event struct {
 	Image               string               `json:"image,omitempty"`
 	Index               *int                 `json:"index,omitempty"`
 	Menu                *EventMenu           `json:"menu,omitempty"`
+	Load                *Load                `json:"load,omitempty"`
 	MenuItem            *EventMenuItem       `json:"menuItem,omitempty"`
 	MenuItemOptions     *MenuItemOptions     `json:"menuItemOptions,omitempty"`
 	MenuItemPosition    *int                 `json:"menuItemPosition,omitempty"`
@@ -49,6 +53,7 @@ type Event struct {
 	Proxy               *WindowProxyOptions  `json:"proxy,omitempty"`
 	RedirectURL         string               `json:"redirectURL,omitempty"`
 	Reply               string               `json:"reply,omitempty"`
+	ResizeOptions       *ResizeOptions       `json:"resizeOptions,omitempty"`
 	Request             *EventRequest        `json:"r,omitempty"`
 	Scheme              string               `json:"scheme,omitempty"`
 	SecondInstance      *EventSecondInstance `json:"secondInstance,omitempty"`
@@ -105,6 +110,20 @@ func (p *EventMessage) Unmarshal(i interface{}) error {
 func (p *EventMessage) UnmarshalJSON(i []byte) error {
 	p.i = i
 	return nil
+}
+
+type ResizeOptions struct {
+	Width      bool `json:"width,omitempty"`
+	Height     bool `json:"height,omitempty"`
+	Horizontal bool `json:"horizontal,omitempty"`
+	Vertical   bool `json:"vertical,omitempty"`
+}
+
+type Load struct {
+	HttpReferrer      string `json:"httpReferrer,omitempty"`
+	UserAgent         string `json:"userAgent,omitempty"`
+	ExtraHeaders      string `json:"extraHeaders,omitempty"`
+	BaseURLForDataURL string `json:"baseURLForDataURL,omitempty"`
 }
 
 // EventMenu represents an event menu

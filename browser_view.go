@@ -11,10 +11,23 @@ import (
 )
 
 const (
-	EventNameBrowserViewCmdCreate          = "browser.view.cmd.create"
-	EventNameBrowserViewCmdSetBounds       = "browser.view.cmd.set.bounds"
-	EventNameBrowserViewEventSetBounds     = "browser.view.event.set.bounds"
-	EventNameBrowserViewEventDidFinishLoad = "browser.view.event.did.finish.load"
+	EventNameBrowserViewCmdCreate                            = "browser.view.cmd.create"
+	EventNameBrowserViewCmdSetBounds                         = "browser.view.cmd.set.bounds"
+	EventNameBrowserViewEventSetBounds                       = "browser.view.event.set.bounds"
+	EventNameBrowserViewEventDidFinishLoad                   = "browser.view.event.did.finish.load"
+	EventNameBrowserViewCmdLoadURL                           = "browser.view.cmd.load.url"
+	EventNameBrowserViewEventLoadedURL                       = "browser.view.event.loaded.url"
+	EventNameBrowserViewCmdWebContentsExecuteJavaScript      = "browser.view.cmd.web.contents.execute.javascript"
+	EventNameBrowserViewEventWebContentsExecutedJavaScript   = "browser.view.event.web.contents.executed.javascript"
+	EventNameBrowserViewCmdGetBounds                         = "browser.view.cmd.get.bounds"
+	EventNameBrowserViewEventGetBounds                       = "browser.view.event.get.bounds"
+	EventNameBrowserViewCmdInterceptStringProtocol           = "browser.view.cmd.intercept.string.protocol"
+	EventNameBrowserViewEventInterceptStringProtocol         = "browser.view.event.intercept.string.protocol"
+	EventNameBrowserViewEventInterceptStringProtocolCallback = "browser.view.event.intercept.string.protocol.callback"
+	EventNameBrowserViewCmdSetBackgroundColor                = "browser.view.cmd.set.background.color"
+	EventNameBrowserViewEventSetBackgroundColor              = "browser.view.event.set.background.color"
+	EventNameBrowserViewCmdSetAutoResize                     = "browser.view.cmd.set.auto.resize"
+	EventNameBrowserViewEventSetAutoResize                   = "browser.view.event.set.auto.resize"
 )
 
 type BrowserView struct {
@@ -36,33 +49,63 @@ func newBrowserView(ctx context.Context, l astikit.SeverityLogger, o Options, p 
 
 	var err error
 
-	// Basic parse
-	if b.url, err = stdUrl.Parse(url); err != nil {
-		err = fmt.Errorf("std parsing of url %s failed: %w", url, err)
-		return nil, err
-	}
-
-	// File
-	if b.url.Scheme == "" {
-		// Get absolute path
-		if url, err = filepath.Abs(url); err != nil {
-			err = fmt.Errorf("getting absolute path of %s failed: %w", url, err)
+	if url != "" {
+		// Basic parse
+		if b.url, err = stdUrl.Parse(url); err != nil {
+			err = fmt.Errorf("std parsing of url %s failed: %w", url, err)
 			return nil, err
 		}
 
-		// Set url
-		b.url = &stdUrl.URL{Path: filepath.ToSlash(url), Scheme: "file"}
+		// File
+		if b.url.Scheme == "" {
+			// Get absolute path
+			if url, err = filepath.Abs(url); err != nil {
+				err = fmt.Errorf("getting absolute path of %s failed: %w", url, err)
+				return nil, err
+			}
+
+			// Set url
+			b.url = &stdUrl.URL{Path: filepath.ToSlash(url), Scheme: "file"}
+		}
 	}
 
 	return b, nil
 }
 
-func (b *BrowserView) SetBounds(bounds *RectangleOptions) {
-	if err := b.ctx.Err(); err != nil {
+func (b *BrowserView) SetBounds(bounds *RectangleOptions) (err error) {
+	if err = b.ctx.Err(); err != nil {
 		return
 	}
 
-	synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdSetBounds, TargetID: b.id, Bounds: bounds}, EventNameBrowserViewEventSetBounds)
+	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdSetBounds, TargetID: b.id, Bounds: bounds}, EventNameBrowserViewEventSetBounds)
+	return
+}
+
+func (b *BrowserView) GetBounds(bounds *RectangleOptions) (e Event, err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	e, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdGetBounds, TargetID: b.id}, EventNameBrowserViewEventGetBounds)
+	return
+}
+
+func (b *BrowserView) SetBackgroundColor(color string) (err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdSetBackgroundColor, TargetID: b.id, Color: color}, EventNameBrowserViewEventSetBackgroundColor)
+	return
+}
+
+func (b *BrowserView) SetAutoResize(resizeOptions *ResizeOptions) (err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdSetAutoResize, TargetID: b.id, ResizeOptions: resizeOptions}, EventNameBrowserViewEventSetAutoResize)
+	return
 }
 
 func (b *BrowserView) Create() (err error) {
@@ -70,5 +113,44 @@ func (b *BrowserView) Create() (err error) {
 		return
 	}
 	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdCreate, TargetID: b.id, URL: b.url.String(), WindowOptions: b.o}, EventNameBrowserViewEventDidFinishLoad)
+	return
+}
+
+func (b *BrowserView) LoadURL(url string, load *Load) (err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdLoadURL, TargetID: b.id, URL: url, Load: load}, EventNameBrowserViewEventLoadedURL)
+	return
+}
+
+//todo: code can only return as string rn
+func (b *BrowserView) ExecuteJavaScript(code string) (e Event, err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+	e, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdWebContentsExecuteJavaScript, TargetID: b.id, Code: code}, EventNameBrowserViewEventWebContentsExecutedJavaScript)
+	return
+}
+
+//func passed in from user
+func (b *BrowserView) InterceptStringProtocol(scheme string, fn func(i Event) (mimeType string, data string, deleteListener bool)) (err error) {
+	b.On(EventNameBrowserViewEventInterceptStringProtocol, func(i Event) (deleteListener bool) {
+		mimeType, data, deleteListener := fn(i)
+
+		if err = b.w.write(Event{CallbackID: i.CallbackID, Name: EventNameBrowserViewEventInterceptStringProtocolCallback, TargetID: b.id, Scheme: scheme, MimeType: mimeType, Data: data}); err != nil {
+			return
+		}
+
+		return
+	})
+
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	b.w.write(Event{Name: EventNameBrowserViewCmdInterceptStringProtocol, TargetID: b.id, Scheme: scheme})
+
 	return
 }
