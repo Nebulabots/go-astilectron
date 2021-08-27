@@ -323,14 +323,15 @@ func (w *Window) Create() (err error) {
 }
 
 // SetBrowserView sets a browserview to a window
-func (w *Window) SetBrowserView(browserView *BrowserView) {
-	if err := w.ctx.Err(); err != nil {
+func (w *Window) SetBrowserView(browserView *BrowserView) (err error) {
+	if err = w.ctx.Err(); err != nil {
 		return
 	}
 
 	w.BrowserView = browserView
 
 	synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdSetBrowserView, TargetID: w.id, BrowserViewID: browserView.id}, EventNameWindowEventSetBrowserView)
+	return
 }
 
 // Destroy destroys the window
