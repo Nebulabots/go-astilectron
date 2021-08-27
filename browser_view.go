@@ -28,6 +28,8 @@ const (
 	EventNameBrowserViewEventSetBackgroundColor              = "browser.view.event.set.background.color"
 	EventNameBrowserViewCmdSetAutoResize                     = "browser.view.cmd.set.auto.resize"
 	EventNameBrowserViewEventSetAutoResize                   = "browser.view.event.set.auto.resize"
+	EventNameBrowserViewCmdSetProxy                          = "browser.view.cmd.web.contents.set.proxy"
+	EventNameBrowserViewEventSetProxy                        = "browser.view.event.web.contents.set.proxy"
 )
 
 type BrowserView struct {
@@ -152,5 +154,14 @@ func (b *BrowserView) InterceptStringProtocol(scheme string, fn func(i Event) (m
 
 	b.w.write(Event{Name: EventNameBrowserViewCmdInterceptStringProtocol, TargetID: b.id, Scheme: scheme})
 
+	return
+}
+
+func (b *BrowserView) SetProxy(proxy *WindowProxyOptions) (err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdSetProxy, TargetID: b.id, Proxy: proxy}, EventNameBrowserViewEventSetProxy)
 	return
 }
