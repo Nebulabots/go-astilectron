@@ -114,7 +114,12 @@ func (b *BrowserView) Create() (err error) {
 	if err = b.ctx.Err(); err != nil {
 		return
 	}
-	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdCreate, TargetID: b.id, URL: b.url.String(), WindowOptions: b.o}, EventNameBrowserViewEventDidFinishLoad)
+
+	if b.url != nil {
+		_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdCreate, TargetID: b.id, URL: b.url.String(), WindowOptions: b.o}, EventNameBrowserViewEventDidFinishLoad)
+	} else {
+		_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdCreate, TargetID: b.id, WindowOptions: b.o}, EventNameBrowserViewEventDidFinishLoad)
+	}
 	return
 }
 
