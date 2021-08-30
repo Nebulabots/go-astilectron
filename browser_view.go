@@ -5,7 +5,6 @@ import (
 	"fmt"
 	stdUrl "net/url"
 	"path/filepath"
-	"sync"
 
 	"github.com/asticode/go-astikit"
 )
@@ -30,13 +29,18 @@ const (
 	EventNameBrowserViewEventSetAutoResize                   = "browser.view.event.set.auto.resize"
 	EventNameBrowserViewCmdSetProxy                          = "browser.view.cmd.web.contents.set.proxy"
 	EventNameBrowserViewEventSetProxy                        = "browser.view.event.web.contents.set.proxy"
+	EventNameBrowserViewCmdOpenDevTools                      = "browser.view.cmd.open.dev.tools"
+	EventNameBrowserViewCmdCloseDevTools                     = "browser.view.cmd.close.dev.tools"
+	EventNameBrowserViewCmdSetUserAgent                      = "browser.view.cmd.set.user.agent"
+	EventNameBrowserViewEventSetUserAgent                    = "browser.view.event.set.user.agent"
+	EventNameBrowserViewCmdUninterceptProtocol               = "browser.view.cmd.unintercept.string.protocol"
+	EventNameBrowserViewEventUninterceptProtocol             = "browser.view.event.unintercept.string.protocol"
 )
 
 type BrowserView struct {
 	*object
 	callbackIdentifier *identifier
 	l                  astikit.SeverityLogger
-	m                  sync.Mutex // Locks o
 	o                  *WindowOptions
 	url                *stdUrl.URL
 }
@@ -168,5 +172,41 @@ func (b *BrowserView) SetProxy(proxy *WindowProxyOptions) (err error) {
 	}
 
 	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdSetProxy, TargetID: b.id, Proxy: proxy}, EventNameBrowserViewEventSetProxy)
+	return
+}
+
+func (b *BrowserView) OpenDevTools() (err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	err = b.w.write(Event{Name: EventNameBrowserViewCmdOpenDevTools, TargetID: b.id})
+	return
+}
+
+func (b *BrowserView) CloseDevTools() (err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	err = b.w.write(Event{Name: EventNameBrowserViewCmdCloseDevTools, TargetID: b.id})
+	return
+}
+
+func (b *BrowserView) SetUserAgent(userAgent string, acceptLanguages string) (err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdSetUserAgent, TargetID: b.id, UserAgent: userAgent, AcceptLanguages: acceptLanguages}, EventNameBrowserViewEventSetUserAgent)
+	return
+}
+
+func (b *BrowserView) UninterceptProtocol() (err error) {
+	if err = b.ctx.Err(); err != nil {
+		return
+	}
+
+	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdUninterceptProtocol, TargetID: b.id}, EventNameBrowserViewEventUninterceptProtocol)
 	return
 }

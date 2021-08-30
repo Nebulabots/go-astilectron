@@ -67,6 +67,10 @@ const (
 	EventNameWindowGetUrl                                             = "window.event.get.url"
 	EventNameWindowCmdSetBrowserView                                  = "window.cmd.set.browser.view"
 	EventNameWindowEventSetBrowserView                                = "window.event.set.browser.view"
+	EventNameWindowCmdAddBrowserView                                  = "window.cmd.add.browser.view"
+	EventNameWindowEventAddBrowserView                                = "window.event.add.browser.view"
+	EventNameWindowCmdRemoveBrowserView                               = "window.cmd.remove.browser.view"
+	EventNameWindowEventRemoveBrowserView                             = "window.event.remove.browser.view"
 )
 
 // Title bar styles
@@ -89,7 +93,8 @@ type Window struct {
 	onMessageOnce      sync.Once
 	Session            *Session
 	url                *stdUrl.URL
-	BrowserView        *BrowserView
+	BrowserViews       map[string]*BrowserView
+	BVMutex            sync.RWMutex
 }
 
 // WindowOptions represents window options
@@ -121,6 +126,7 @@ type WindowOptions struct {
 	MinWidth               *int            `json:"minWidth,omitempty"`
 	Modal                  *bool           `json:"modal,omitempty"`
 	Movable                *bool           `json:"movable,omitempty"`
+	Partition              *string         `json:"partition,omitempty"`
 	Resizable              *bool           `json:"resizable,omitempty"`
 	Show                   *bool           `json:"show,omitempty"`
 	SkipTaskbar            *bool           `json:"skipTaskbar,omitempty"`
@@ -220,6 +226,8 @@ func newWindow(ctx context.Context, l astikit.SeverityLogger, o Options, p Paths
 		l:                  l,
 		o:                  wo,
 		object:             newObject(ctx, d, i, wrt, i.new()),
+		BrowserViews:       make(map[string]*BrowserView),
+		BVMutex:            sync.RWMutex{},
 	}
 	w.Session = newSession(w.ctx, d, i, wrt)
 
@@ -328,9 +336,40 @@ func (w *Window) SetBrowserView(browserView *BrowserView) (err error) {
 		return
 	}
 
-	w.BrowserView = browserView
+	w.BVMutex.Lock()
+	defer w.BVMutex.Unlock()
+
+	w.BrowserViews[browserView.id] = browserView
 
 	synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdSetBrowserView, TargetID: w.id, BrowserViewID: browserView.id}, EventNameWindowEventSetBrowserView)
+	return
+}
+
+func (w *Window) AddBrowserView(browserView *BrowserView) (err error) {
+	if err = w.ctx.Err(); err != nil {
+		return
+	}
+
+	w.BVMutex.Lock()
+	defer w.BVMutex.Unlock()
+
+	w.BrowserViews[browserView.id] = browserView
+
+	synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdAddBrowserView, TargetID: w.id, BrowserViewID: browserView.id}, EventNameWindowEventAddBrowserView)
+	return
+}
+
+func (w *Window) RemoveBrowserView(browserView *BrowserView) (err error) {
+	if err = w.ctx.Err(); err != nil {
+		return
+	}
+
+	w.BVMutex.Lock()
+	defer w.BVMutex.Unlock()
+
+	delete(w.BrowserViews, browserView.id)
+
+	synchronousEvent(w.ctx, w, w.w, Event{Name: EventNameWindowCmdRemoveBrowserView, TargetID: w.id, BrowserViewID: browserView.id}, EventNameWindowEventRemoveBrowserView)
 	return
 }
 

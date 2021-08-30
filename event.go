@@ -20,15 +20,16 @@ type Event struct {
 	// This is a list of all possible payloads.
 	// A choice was made not to use interfaces since it's a pain in the ass asserting each an every payload afterwards
 	// We use pointers so that omitempty works
-	AuthInfo      *EventAuthInfo    `json:"authInfo,omitempty"`
-	Badge         string            `json:"badge,omitempty"`
-	BounceType    string            `json:"bounceType,omitempty"`
-	Bounds        *RectangleOptions `json:"bounds,omitempty"`
-	BrowserViewID string            `json:"browserViewID,omitempty"`
-	Cancel        *bool             `json:"cancel,omitempty"`
-	CallbackID    string            `json:"callbackId,omitempty"`
-	Color         string            `json:"color,omitempty"`
-	Code          string            `json:"code,omitempty"`
+	AcceptLanguages string            `json:"acceptLanguages,omitempty"`
+	AuthInfo        *EventAuthInfo    `json:"authInfo,omitempty"`
+	Badge           string            `json:"badge,omitempty"`
+	BounceType      string            `json:"bounceType,omitempty"`
+	Bounds          *RectangleOptions `json:"bounds,omitempty"`
+	BrowserViewID   string            `json:"browserViewID,omitempty"`
+	Cancel          *bool             `json:"cancel,omitempty"`
+	CallbackID      string            `json:"callbackId,omitempty"`
+	Color           string            `json:"color,omitempty"`
+	Code            string            `json:"code,omitempty"`
 	//todo: can only be a string now?
 	CodeResult string          `json:"codeResult,omitempty"`
 	Cookies    []SessionCookie `json:"cookies,omitempty"`
@@ -63,6 +64,7 @@ type Event struct {
 	URL                 string               `json:"url,omitempty"`
 	URLNew              string               `json:"newUrl,omitempty"`
 	URLOld              string               `json:"oldUrl,omitempty"`
+	UserAgent           string               `json:"userAgent,omitempty"`
 	Username            string               `json:"username,omitempty"`
 	WindowID            string               `json:"windowId,omitempty"`
 	WindowOptions       *WindowOptions       `json:"windowOptions,omitempty"`
