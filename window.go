@@ -126,7 +126,6 @@ type WindowOptions struct {
 	MinWidth               *int            `json:"minWidth,omitempty"`
 	Modal                  *bool           `json:"modal,omitempty"`
 	Movable                *bool           `json:"movable,omitempty"`
-	Partition              *string         `json:"partition,omitempty"`
 	Resizable              *bool           `json:"resizable,omitempty"`
 	Show                   *bool           `json:"show,omitempty"`
 	SkipTaskbar            *bool           `json:"skipTaskbar,omitempty"`
