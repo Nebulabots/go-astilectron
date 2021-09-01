@@ -131,6 +131,6 @@ func (s *Session) SetUserAgent(userAgent string, acceptLanguages string) (err er
 		return
 	}
 
-	e, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdSetUserAgent, TargetID: s.id, UserAgent: userAgent, AcceptLanguages: acceptLanguages}, EventNameSessionEventSetUserAgent)
+	_, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdSetUserAgent, TargetID: s.id, UserAgent: userAgent, AcceptLanguages: acceptLanguages}, EventNameSessionEventSetUserAgent)
 	return
 }
