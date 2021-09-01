@@ -51,6 +51,7 @@ type Event struct {
 	NotificationOptions *NotificationOptions `json:"notificationOptions,omitempty"`
 	Password            string               `json:"password,omitempty"`
 	Path                string               `json:"path,omitempty"`
+	Partition           string               `json:"partition,omitempty"`
 	Proxy               *WindowProxyOptions  `json:"proxy,omitempty"`
 	RedirectURL         string               `json:"redirectURL,omitempty"`
 	Reply               string               `json:"reply,omitempty"`

@@ -17,6 +17,8 @@ const (
 	EventNameSessionEventSetCookies      = "session.event.cookies.set"
 	EventNameSessionCmdGetCookies        = "session.cmd.cookies.get"
 	EventNameSessionEventGetCookies      = "session.event.cookies.get"
+	EventNameSessionCmdFromPartition     = "session.cmd.from.partition"
+	EventNameSessionEventFromPartition   = "session.event.from.partition"
 )
 
 // Session represents a session
@@ -29,7 +31,7 @@ type Session struct {
 }
 
 // newSession creates a new session
-func newSession(ctx context.Context, d *dispatcher, i *identifier, w *writer) *Session {
+func NewSession(ctx context.Context, d *dispatcher, i *identifier, w *writer) *Session {
 	s := &Session{object: newObject(ctx, d, i, w, i.new())}
 
 	s.Protocol = newProtocol(ctx, d, i, w)
@@ -110,5 +112,14 @@ func (s *Session) GetCookies() (e Event, err error) {
 		return
 	}
 	e, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdGetCookies, TargetID: s.id}, EventNameSessionEventGetCookies)
+	return
+}
+
+func (s *Session) FromPartition(partition string) (e Event, err error) {
+	if err = s.ctx.Err(); err != nil {
+		return
+	}
+
+	e, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdFromPartition, SessionID: s.id, Partition: partition}, EventNameSessionEventFromPartition)
 	return
 }

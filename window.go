@@ -228,7 +228,7 @@ func newWindow(ctx context.Context, l astikit.SeverityLogger, o Options, p Paths
 		BrowserViews:       make(map[string]*BrowserView),
 		BVMutex:            sync.RWMutex{},
 	}
-	w.Session = newSession(w.ctx, d, i, wrt)
+	w.Session = NewSession(w.ctx, d, i, wrt)
 
 	// Check app details
 	if wo.Icon == nil && p.AppIconDefaultSrc() != "" {

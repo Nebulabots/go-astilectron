@@ -11,7 +11,7 @@ func TestSession_Actions(t *testing.T) {
 	var i = newIdentifier()
 	var wrt = &mockedWriter{}
 	var w = newWriter(wrt, &logger{})
-	var s = newSession(context.Background(), d, i, w)
+	var s = NewSession(context.Background(), d, i, w)
 
 	// Actions
 	testObjectAction(t, func() error { return s.ClearCache() }, s.object, wrt, "{\"name\":\"session.cmd.clear.cache\",\"targetID\":\"1\"}\n", EventNameSessionEventClearedCache)
