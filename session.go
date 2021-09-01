@@ -29,11 +29,15 @@ const (
 // https://github.com/electron/electron/blob/v1.8.1/docs/api/session.md
 type Session struct {
 	*object
+	ID string
 }
 
 // newSession creates a new session
 func newSession(ctx context.Context, d *dispatcher, i *identifier, w *writer) *Session {
-	s := &Session{object: newObject(ctx, d, i, w, i.new())}
+	id := i.new()
+	s := &Session{object: newObject(ctx, d, i, w, id)}
+
+	s.ID = id
 
 	return s
 }
