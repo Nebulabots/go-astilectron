@@ -19,6 +19,8 @@ const (
 	EventNameSessionEventGetCookies      = "session.event.cookies.get"
 	EventNameSessionCmdFromPartition     = "session.cmd.from.partition"
 	EventNameSessionEventFromPartition   = "session.event.from.partition"
+	EventNameSessionCmdSetUserAgent      = "session.cmd.set.user.agent"
+	EventNameSessionEventSetUserAgent    = "session.event.set.user.agent"
 )
 
 // Session represents a session
@@ -115,11 +117,20 @@ func (s *Session) GetCookies() (e Event, err error) {
 	return
 }
 
-func (s *Session) FromPartition(partition string) (e Event, err error) {
+func (s *Session) FromPartition(partition string) (err error) {
 	if err = s.ctx.Err(); err != nil {
 		return
 	}
 
-	e, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdFromPartition, SessionID: s.id, Partition: partition}, EventNameSessionEventFromPartition)
+	_, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdFromPartition, SessionID: s.id, Partition: partition}, EventNameSessionEventFromPartition)
+	return
+}
+
+func (s *Session) SetUserAgent(userAgent string, acceptLanguages string) (err error) {
+	if err = s.ctx.Err(); err != nil {
+		return
+	}
+
+	e, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdSetUserAgent, TargetID: s.id, UserAgent: userAgent, AcceptLanguages: acceptLanguages}, EventNameSessionEventSetUserAgent)
 	return
 }

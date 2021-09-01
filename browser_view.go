@@ -43,14 +43,18 @@ type BrowserView struct {
 	l                  astikit.SeverityLogger
 	o                  *WindowOptions
 	url                *stdUrl.URL
+	ID                 string
 }
 
 func newBrowserView(ctx context.Context, l astikit.SeverityLogger, o Options, p Paths, url string, wo *WindowOptions, d *dispatcher, i *identifier, wrt *writer) (*BrowserView, error) {
+	id := i.new()
+
 	b := &BrowserView{
 		callbackIdentifier: newIdentifier(),
 		l:                  l,
 		o:                  wo,
-		object:             newObject(ctx, d, i, wrt, i.new()),
+		object:             newObject(ctx, d, i, wrt, id),
+		ID:                 id,
 	}
 
 	var err error
@@ -190,15 +194,6 @@ func (b *BrowserView) CloseDevTools() (err error) {
 	}
 
 	err = b.w.write(Event{Name: EventNameBrowserViewCmdCloseDevTools, TargetID: b.id})
-	return
-}
-
-func (b *BrowserView) SetUserAgent(userAgent string, acceptLanguages string) (err error) {
-	if err = b.ctx.Err(); err != nil {
-		return
-	}
-
-	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdSetUserAgent, TargetID: b.id, UserAgent: userAgent, AcceptLanguages: acceptLanguages}, EventNameBrowserViewEventSetUserAgent)
 	return
 }
 
