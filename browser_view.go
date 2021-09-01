@@ -197,11 +197,11 @@ func (b *BrowserView) CloseDevTools() (err error) {
 	return
 }
 
-func (b *BrowserView) UninterceptProtocol() (err error) {
+func (b *BrowserView) UninterceptProtocol(scheme string) (err error) {
 	if err = b.ctx.Err(); err != nil {
 		return
 	}
 
-	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdUninterceptProtocol, TargetID: b.id}, EventNameBrowserViewEventUninterceptProtocol)
+	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdUninterceptProtocol, TargetID: b.id, Scheme: scheme}, EventNameBrowserViewEventUninterceptProtocol)
 	return
 }
