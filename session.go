@@ -29,14 +29,11 @@ const (
 // https://github.com/electron/electron/blob/v1.8.1/docs/api/session.md
 type Session struct {
 	*object
-	Protocol *Protocol
 }
 
 // newSession creates a new session
-func NewSession(ctx context.Context, d *dispatcher, i *identifier, w *writer) *Session {
+func newSession(ctx context.Context, d *dispatcher, i *identifier, w *writer) *Session {
 	s := &Session{object: newObject(ctx, d, i, w, i.new())}
-
-	s.Protocol = newProtocol(ctx, d, i, w)
 
 	return s
 }

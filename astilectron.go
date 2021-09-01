@@ -424,6 +424,10 @@ func (a *Astilectron) NewBrowserView(url string, o *WindowOptions) (*BrowserView
 	return newBrowserView(a.worker.Context(), a.l, a.options, a.Paths(), url, o, a.dispatcher, a.identifier, a.writer)
 }
 
+func (a *Astilectron) NewSession() *Session {
+	return newSession(a.worker.Context(), a.dispatcher, a.identifier, a.writer)
+}
+
 // NewWindowInDisplay creates a new window in a specific display
 // This overrides the center attribute
 func (a *Astilectron) NewWindowInDisplay(d *Display, url string, o *WindowOptions) (*Window, error) {
