@@ -420,8 +420,8 @@ func (a *Astilectron) NewWindow(url string, o *WindowOptions) (*Window, error) {
 }
 
 //New BrowserView creates a new browserview
-func (a *Astilectron) NewBrowserView(url string, o *WindowOptions) (*BrowserView, error) {
-	return newBrowserView(a.worker.Context(), a.l, a.options, a.Paths(), url, o, a.dispatcher, a.identifier, a.writer)
+func (a *Astilectron) NewBrowserView(url string, o *WindowOptions, s *Session) (*BrowserView, error) {
+	return newBrowserView(a.worker.Context(), a.l, a.options, a.Paths(), url, o, s, a.dispatcher, a.identifier, a.writer)
 }
 
 func (a *Astilectron) NewSession() *Session {

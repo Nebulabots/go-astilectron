@@ -44,12 +44,13 @@ type BrowserView struct {
 	o                  *WindowOptions
 	url                *stdUrl.URL
 	ID                 string
+	Session            *Session
 }
 
-func newBrowserView(ctx context.Context, l astikit.SeverityLogger, o Options, p Paths, url string, wo *WindowOptions, d *dispatcher, i *identifier, wrt *writer) (*BrowserView, error) {
+func newBrowserView(ctx context.Context, l astikit.SeverityLogger, o Options, p Paths, url string, wo *WindowOptions, s *Session, d *dispatcher, i *identifier, wrt *writer) (b *BrowserView, err error) {
 	id := i.new()
 
-	b := &BrowserView{
+	b = &BrowserView{
 		callbackIdentifier: newIdentifier(),
 		l:                  l,
 		o:                  wo,
@@ -57,7 +58,7 @@ func newBrowserView(ctx context.Context, l astikit.SeverityLogger, o Options, p 
 		ID:                 id,
 	}
 
-	var err error
+	b.Session = s
 
 	if url != "" {
 		// Basic parse
@@ -79,7 +80,7 @@ func newBrowserView(ctx context.Context, l astikit.SeverityLogger, o Options, p 
 		}
 	}
 
-	return b, nil
+	return
 }
 
 func (b *BrowserView) SetBounds(bounds *RectangleOptions) (err error) {
