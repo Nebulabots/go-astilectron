@@ -6,21 +6,28 @@ import (
 
 // Session event names
 const (
-	EventNameSessionCmdClearCache        = "session.cmd.clear.cache"
-	EventNameSessionEventClearedCache    = "session.event.cleared.cache"
-	EventNameSessionCmdFlushStorage      = "session.cmd.flush.storage"
-	EventNameSessionEventFlushedStorage  = "session.event.flushed.storage"
-	EventNameSessionCmdLoadExtension     = "session.cmd.load.extension"
-	EventNameSessionEventLoadedExtension = "session.event.loaded.extension"
-	EventNameSessionEventWillDownload    = "session.event.will.download"
-	EventNameSessionCmdSetCookies        = "session.cmd.cookies.set"
-	EventNameSessionEventSetCookies      = "session.event.cookies.set"
-	EventNameSessionCmdGetCookies        = "session.cmd.cookies.get"
-	EventNameSessionEventGetCookies      = "session.event.cookies.get"
-	EventNameSessionCmdFromPartition     = "session.cmd.from.partition"
-	EventNameSessionEventFromPartition   = "session.event.from.partition"
-	EventNameSessionCmdSetUserAgent      = "session.cmd.set.user.agent"
-	EventNameSessionEventSetUserAgent    = "session.event.set.user.agent"
+	EventNameSessionCmdClearCache                              = "session.cmd.clear.cache"
+	EventNameSessionEventClearedCache                          = "session.event.cleared.cache"
+	EventNameSessionCmdFlushStorage                            = "session.cmd.flush.storage"
+	EventNameSessionEventFlushedStorage                        = "session.event.flushed.storage"
+	EventNameSessionCmdLoadExtension                           = "session.cmd.load.extension"
+	EventNameSessionEventLoadedExtension                       = "session.event.loaded.extension"
+	EventNameSessionEventWillDownload                          = "session.event.will.download"
+	EventNameSessionCmdSetCookies                              = "session.cmd.cookies.set"
+	EventNameSessionEventSetCookies                            = "session.event.cookies.set"
+	EventNameSessionCmdGetCookies                              = "session.cmd.cookies.get"
+	EventNameSessionEventGetCookies                            = "session.event.cookies.get"
+	EventNameSessionCmdFromPartition                           = "session.cmd.from.partition"
+	EventNameSessionEventFromPartition                         = "session.event.from.partition"
+	EventNameSessionCmdSetUserAgent                            = "session.cmd.set.user.agent"
+	EventNameSessionEventSetUserAgent                          = "session.event.set.user.agent"
+	EventNameSessionCmdCloseAllConnections                     = "session.cmd.close.all.connections"
+	EventNameSessionEventCloseAllConnections                   = "session.event.close.all.connections"
+	EventNameSessionCmdSetProxy                                = "session.cmd.set.proxy"
+	EventNameSessionEventSetProxy                              = "session.event.set.proxy"
+	EventNameSessionCmdWebRequestOnBeforeSendHeaders           = "session.cmd.web.request.on.before.headers"
+	EventNameSessionEventWebRequestOnBeforeSendHeadersCallback = "session.event.web.request.on.before.headers.callback"
+	EventNameSessionEventWebRequestOnBeforeSendHeaders         = "session.event.web.request.on.before.headers"
 )
 
 // Session represents a session
@@ -133,5 +140,23 @@ func (s *Session) SetUserAgent(userAgent string, acceptLanguages string) (err er
 	}
 
 	_, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdSetUserAgent, TargetID: s.id, UserAgent: userAgent, AcceptLanguages: acceptLanguages}, EventNameSessionEventSetUserAgent)
+	return
+}
+
+func (s *Session) CloseAllConnections() (err error) {
+	if err = s.ctx.Err(); err != nil {
+		return
+	}
+
+	_, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdCloseAllConnections, TargetID: s.id}, EventNameSessionEventCloseAllConnections)
+	return
+}
+
+func (s *Session) SetProxy(windowProxyOptions WindowProxyOptions) (err error) {
+	if err = s.ctx.Err(); err != nil {
+		return
+	}
+
+	_, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameSessionCmdSetProxy, TargetID: s.id, Proxy: &windowProxyOptions}, EventNameSessionEventSetProxy)
 	return
 }

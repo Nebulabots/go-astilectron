@@ -206,3 +206,26 @@ func (b *BrowserView) UninterceptProtocol(scheme string) (err error) {
 	_, err = synchronousEvent(b.ctx, b, b.w, Event{Name: EventNameBrowserViewCmdUninterceptProtocol, TargetID: b.id, Scheme: scheme}, EventNameBrowserViewEventUninterceptProtocol)
 	return
 }
+
+func (b *BrowserView) OnLogin(fn func(i Event) (username, password string, err error)) {
+	b.On(EventNameWebContentsEventLogin, func(i Event) (deleteListener bool) {
+		// Get username and password
+		username, password, err := fn(i)
+		if err != nil {
+			b.l.Error(fmt.Errorf("getting username and password failed: %w", err))
+			return
+		}
+
+		// No auth
+		if len(username) == 0 && len(password) == 0 {
+			return
+		}
+
+		// Send message back
+		if err = b.w.write(Event{CallbackID: i.CallbackID, Name: EventNameWebContentsEventLoginCallback, Password: password, TargetID: b.id, Username: username}); err != nil {
+			b.l.Error(fmt.Errorf("writing login callback message failed: %w", err))
+			return
+		}
+		return
+	})
+}
