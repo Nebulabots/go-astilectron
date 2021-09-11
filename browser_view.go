@@ -228,4 +228,12 @@ func (b *BrowserView) OnLogin(fn func(i Event) (username, password string, err e
 		}
 		return
 	})
+
+	if err := b.ctx.Err(); err != nil {
+		return
+	}
+
+	b.w.write(Event{Name: EventNameWebContentsEventLogin, TargetID: b.id})
+
+	return
 }
