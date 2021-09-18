@@ -6,28 +6,28 @@ import (
 
 // Session event names
 const (
-	EventNameSessionCmdClearCache                              = "session.cmd.clear.cache"
-	EventNameSessionEventClearedCache                          = "session.event.cleared.cache"
-	EventNameSessionCmdFlushStorage                            = "session.cmd.flush.storage"
-	EventNameSessionEventFlushedStorage                        = "session.event.flushed.storage"
-	EventNameSessionCmdLoadExtension                           = "session.cmd.load.extension"
-	EventNameSessionEventLoadedExtension                       = "session.event.loaded.extension"
-	EventNameSessionEventWillDownload                          = "session.event.will.download"
-	EventNameSessionCmdSetCookies                              = "session.cmd.cookies.set"
-	EventNameSessionEventSetCookies                            = "session.event.cookies.set"
-	EventNameSessionCmdGetCookies                              = "session.cmd.cookies.get"
-	EventNameSessionEventGetCookies                            = "session.event.cookies.get"
-	EventNameSessionCmdFromPartition                           = "session.cmd.from.partition"
-	EventNameSessionEventFromPartition                         = "session.event.from.partition"
-	EventNameSessionCmdSetUserAgent                            = "session.cmd.set.user.agent"
-	EventNameSessionEventSetUserAgent                          = "session.event.set.user.agent"
-	EventNameSessionCmdCloseAllConnections                     = "session.cmd.close.all.connections"
-	EventNameSessionEventCloseAllConnections                   = "session.event.close.all.connections"
-	EventNameSessionCmdSetProxy                                = "session.cmd.set.proxy"
-	EventNameSessionEventSetProxy                              = "session.event.set.proxy"
-	EventNameSessionCmdWebRequestOnBeforeSendHeaders           = "session.cmd.web.request.on.before.headers"
-	EventNameSessionEventWebRequestOnBeforeSendHeadersCallback = "session.event.web.request.on.before.headers.callback"
-	EventNameSessionEventWebRequestOnBeforeSendHeaders         = "session.event.web.request.on.before.headers"
+	EventNameSessionCmdClearCache                          = "session.cmd.clear.cache"
+	EventNameSessionEventClearedCache                      = "session.event.cleared.cache"
+	EventNameSessionCmdFlushStorage                        = "session.cmd.flush.storage"
+	EventNameSessionEventFlushedStorage                    = "session.event.flushed.storage"
+	EventNameSessionCmdLoadExtension                       = "session.cmd.load.extension"
+	EventNameSessionEventLoadedExtension                   = "session.event.loaded.extension"
+	EventNameSessionEventWillDownload                      = "session.event.will.download"
+	EventNameSessionCmdSetCookies                          = "session.cmd.cookies.set"
+	EventNameSessionEventSetCookies                        = "session.event.cookies.set"
+	EventNameSessionCmdGetCookies                          = "session.cmd.cookies.get"
+	EventNameSessionEventGetCookies                        = "session.event.cookies.get"
+	EventNameSessionCmdFromPartition                       = "session.cmd.from.partition"
+	EventNameSessionEventFromPartition                     = "session.event.from.partition"
+	EventNameSessionCmdSetUserAgent                        = "session.cmd.set.user.agent"
+	EventNameSessionEventSetUserAgent                      = "session.event.set.user.agent"
+	EventNameSessionCmdCloseAllConnections                 = "session.cmd.close.all.connections"
+	EventNameSessionEventCloseAllConnections               = "session.event.close.all.connections"
+	EventNameSessionCmdSetProxy                            = "session.cmd.set.proxy"
+	EventNameSessionEventSetProxy                          = "session.event.set.proxy"
+	EventNameSessionCmdWebRequestOnBeforeRequest           = "session.cmd.web.request.on.before.request"
+	EventNameSessionEventWebRequestOnBeforeRequest         = "session.event.web.request.on.before.request"
+	EventNameSessionEventWebRequestOnBeforeRequestCallback = "session.event.web.request.on.before.request.callback"
 )
 
 // Session represents a session
@@ -76,13 +76,13 @@ func (s *Session) LoadExtension(path string) (err error) {
 	return
 }
 
-func (s *Session) OnBeforeRequest(fn func(i Event) (bool, string, bool)) (err error) {
+func (s *Session) OnBeforeRequest(filter FilterOptions, fn func(i Event) (cancel bool, redirectUrl string, deleteListener bool)) (err error) {
 	// Setup the event to handle the callback
-	s.On(EventNameWebContentsEventSessionWebRequestOnBeforeRequest, func(i Event) (deleteListener bool) {
+	s.On(EventNameSessionEventWebRequestOnBeforeRequest, func(i Event) (deleteListener bool) {
 		cancel, redirectUrl, deleteListener := fn(i)
 
 		// Send message back
-		if err = s.w.write(Event{CallbackID: i.CallbackID, Name: EventNameWebContentsEventSessionWebRequestOnBeforeRequestCallback, TargetID: s.id, Cancel: &cancel, RedirectURL: redirectUrl}); err != nil {
+		if err = s.w.write(Event{CallbackID: i.CallbackID, Name: EventNameSessionEventWebRequestOnBeforeRequestCallback, TargetID: s.id, Cancel: &cancel, RedirectURL: redirectUrl}); err != nil {
 			return
 		}
 
@@ -92,7 +92,8 @@ func (s *Session) OnBeforeRequest(fn func(i Event) (bool, string, bool)) (err er
 	if err = s.ctx.Err(); err != nil {
 		return
 	}
-	_, err = synchronousEvent(s.ctx, s, s.w, Event{Name: EventNameWebContentsEventSessionWebRequestOnBeforeRequest, TargetID: s.id}, EventNameWindowEventWebContentsOnBeforeRequest)
+
+	s.w.write(Event{Name: EventNameSessionCmdWebRequestOnBeforeRequest, TargetID: s.id, Filter: &filter})
 	return
 }
 

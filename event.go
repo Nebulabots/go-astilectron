@@ -38,6 +38,7 @@ type Event struct {
 	Displays            *EventDisplays       `json:"displays,omitempty"`
 	FilePath            string               `json:"filePath,omitempty"`
 	ID                  *int                 `json:"id,omitempty"`
+	Filter              *FilterOptions       `json:"filter,omitempty"`
 	Image               string               `json:"image,omitempty"`
 	Index               *int                 `json:"index,omitempty"`
 	Menu                *EventMenu           `json:"menu,omitempty"`
@@ -56,7 +57,7 @@ type Event struct {
 	RedirectURL         string               `json:"redirectURL,omitempty"`
 	Reply               string               `json:"reply,omitempty"`
 	ResizeOptions       *ResizeOptions       `json:"resizeOptions,omitempty"`
-	Request             *EventRequest        `json:"r,omitempty"`
+	Request             *EventRequest        `json:"request,omitempty"`
 	Scheme              string               `json:"scheme,omitempty"`
 	SecondInstance      *EventSecondInstance `json:"secondInstance,omitempty"`
 	SessionID           string               `json:"sessionId,omitempty"`
@@ -84,6 +85,10 @@ type EventAuthInfo struct {
 type EventDisplays struct {
 	All     []*DisplayOptions `json:"all,omitempty"`
 	Primary *DisplayOptions   `json:"primary,omitempty"`
+}
+
+type FilterOptions struct {
+	Urls []string `json:"urls,omitempty"`
 }
 
 // EventMessage represents an event message
