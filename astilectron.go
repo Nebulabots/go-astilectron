@@ -449,6 +449,11 @@ func (a *Astilectron) NewTray(o *TrayOptions) *Tray {
 	return newTray(a.worker.Context(), o, a.dispatcher, a.identifier, a.writer)
 }
 
+// NewDialog creates a new dialog
+func (a *Astilectron) NewDialog(o *DialogOptions) *Dialog {
+	return newDialog(a.worker.Context(), o, a.dispatcher, a.identifier, a.writer)
+}
+
 // NewNotification creates a new notification
 func (a *Astilectron) NewNotification(o *NotificationOptions) *Notification {
 	return newNotification(a.worker.Context(), o, a.supported != nil && a.supported.Notification != nil && *a.supported.Notification, a.dispatcher, a.identifier, a.writer)
