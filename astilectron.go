@@ -28,18 +28,17 @@ var (
 
 // App event names
 const (
-	EventNameAppClose                          = "app.close"
-	EventNameAppCmdQuit                        = "app.cmd.quit" // Sends an event to Electron to properly quit the app
-	EventNameAppCmdStop                        = "app.cmd.stop" // Cancel the context which results in exiting abruptly Electron's app
-	EventNameAppCrash                          = "app.crash"
-	EventNameAppErrorAccept                    = "app.error.accept"
-	EventNameAppEventReady                     = "app.event.ready"
-	EventNameAppEventSecondInstance            = "app.event.second.instance"
-	EventNameAppNoAccept                       = "app.no.accept"
-	EventNameAppTooManyAccept                  = "app.too.many.accept"
-	EventNameAppCmdUncaughtException           = "app.cmd.uncaught.exception"
-	EventNameAppEventUncaughtException         = "app.event.uncaught.exception"
-	EventNameAppEventUncaughtExceptionCallback = "app.event.uncaught.exception.callback"
+	EventNameAppClose                  = "app.close"
+	EventNameAppCmdQuit                = "app.cmd.quit" // Sends an event to Electron to properly quit the app
+	EventNameAppCmdStop                = "app.cmd.stop" // Cancel the context which results in exiting abruptly Electron's app
+	EventNameAppCrash                  = "app.crash"
+	EventNameAppErrorAccept            = "app.error.accept"
+	EventNameAppEventReady             = "app.event.ready"
+	EventNameAppEventSecondInstance    = "app.event.second.instance"
+	EventNameAppNoAccept               = "app.no.accept"
+	EventNameAppTooManyAccept          = "app.too.many.accept"
+	EventNameAppCmdUncaughtException   = "app.cmd.uncaught.exception"
+	EventNameAppEventUncaughtException = "app.event.uncaught.exception"
 )
 
 // Astilectron represents an object capable of interacting with Astilectron
@@ -389,13 +388,7 @@ func (a *Astilectron) Wait() {
 
 func (a *Astilectron) CatchUncaughtExceptionErrors(fn func(i Event) (deleteListener bool)) error {
 	a.On(EventNameAppEventUncaughtException, func(i Event) (deleteListener bool) {
-		deleteListener = fn(i)
-
-		if err := a.writer.write(Event{CallbackID: i.CallbackID, Name: EventNameAppEventUncaughtExceptionCallback}); err != nil {
-			return
-		}
-
-		return
+		return fn(i)
 	})
 
 	if err := a.worker.Context().Err(); err != nil {
