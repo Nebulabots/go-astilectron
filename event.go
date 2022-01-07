@@ -37,6 +37,7 @@ type Event struct {
 	Data                  string                 `json:"data,omitempty"`
 	Displays              *EventDisplays         `json:"displays,omitempty"`
 	DialogOptions         *DialogOptions         `json:"dialogOptions,omitempty"`
+	Error                 string                 `json:"error,omitempty"`
 	FilePath              string                 `json:"filePath,omitempty"`
 	ID                    *int                   `json:"id,omitempty"`
 	Filter                *FilterOptions         `json:"filter,omitempty"`
